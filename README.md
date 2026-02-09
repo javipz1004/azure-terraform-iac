@@ -44,3 +44,39 @@ Establece la suscripción de trabajo mediante el siguiente comando sustituyendo 
 ```powershell
 $ az account set --subscription "TU_SUBSCRIPTION_ID_AQUÍ"
 ```
+---
+
+## 3. Creación del Service Principal
+
+El siguiente paso fundamental es la creación de un **Service Principal**. [cite_start]En el ecosistema de Azure, un Service Principal es una identidad de aplicación (un "usuario no humano") que permite que herramientas externas, como Terraform o un pipeline de CI/CD, interactúen con tus recursos de forma segura[cite: 24].
+
+### ¿Por qué es necesario este paso?
+Implementar un Service Principal es una práctica estándar en la industria por los siguientes motivos:
+* [cite_start]**Seguridad y Aislamiento:** Evitamos el uso de nuestra cuenta personal de usuario para tareas automatizadas, lo cual se considera una mala práctica en entornos profesionales y de producción[cite: 27].
+* [cite_start]**Automatización:** Al proporcionar a Terraform sus propias credenciales, el sistema puede autenticarse automáticamente ante la API de Azure sin necesidad de ejecutar un `az login` manual en cada sesión[cite: 28].
+* [cite_start]**Control de Accesos (RBAC):** Permite aplicar el principio de mínimo privilegio, limitando exactamente qué acciones puede realizar este "robot" (asignándole el rol de **Contributor**) y sobre qué suscripción específica tiene poder[cite: 29].
+
+### Comando de Creación
+Para generar esta identidad y obtener sus credenciales de acceso, utilizamos el siguiente comando:
+
+```powershell
+$ az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/<TU_SUBSCRIPTION_ID>"
+```
+[cite_start][cite: 31, 32]
+
+> [cite_start]**Nota:** Por motivos de seguridad, no se incluye captura de la terminal en este paso para proteger el ID de la suscripción[cite: 33].
+
+### Valores Obtenidos
+Al ejecutar el comando, la terminal devolverá un objeto JSON con cuatro valores fundamentales que Terraform utilizará para la autenticación:
+1. [cite_start]**appId:** El identificador único del Service Principal (Client ID)[cite: 35].
+2. [cite_start]**displayName:** El nombre identificativo asignado a la identidad en Azure[cite: 36].
+3. [cite_start]**password:** La contraseña o secreto de cliente (Client Secret)[cite: 37].
+4. [cite_start]**tenant:** El ID del directorio de nuestra organización[cite: 38].
+
+---
+
+### ⚠️ Advertencia de Seguridad
+[cite_start]Por razones críticas de seguridad, **no se incluye una captura de pantalla de esta salida**[cite: 39]. El valor de la **password** es extremadamente sensible:
+* [cite_start]Solo se muestra una vez al momento de la creación[cite: 40].
+* [cite_start]Permite el acceso total a los recursos bajo el rol asignado dentro de la suscripción[cite: 40].
+* [cite_start]**Bajo ninguna circunstancia** debe ser compartido, enviado por canales no seguros o subido a un repositorio público[cite: 41].
