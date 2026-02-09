@@ -110,7 +110,10 @@ Para mantener una estructura profesional y evitar conflictos con otros experimen
 Ejecuta el siguiente comando en PowerShell para crear tu espacio de trabajo:
 
 ```powershell
-$New-Item -Path "C:\" -Name "learn-terraform-azure" -ItemType "directory"$ cd C:\learn-terraform-azure
+$New-Item -Path "C:\" -Name "learn-terraform-azure" -ItemType "directory"$
+```
+```powershell
+cd C:\learn-terraform-azure
 ```
 ---
 
