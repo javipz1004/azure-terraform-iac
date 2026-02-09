@@ -259,3 +259,47 @@ $ terraform state list
 ![Captura: Listado de recursos en el estado](images/terraform_state_list.png)
 ![Captura: Listado de recursos en el estado](images/terraform_state.png)
 
+---
+
+## 12. Creación de Nuevos Recursos: Red Virtual (VNet)
+
+Una vez que el Grupo de Recursos ha sido desplegado, el siguiente paso es ampliar nuestra infraestructura añadiendo una **Red Virtual (VNet)**. En Azure, una VNet es un entorno aislado y seguro que permite que los recursos se comuniquen entre sí, con Internet y con redes on-premise.
+
+### ¿Por qué realizamos este paso?
+* **Aislamiento y Segmentación:** La VNet nos permite definir nuestro propio espacio de direcciones IP privadas. En este caso, utilizaremos el rango de red `10.0.0.0/16`.
+* **Gestión Inteligente de Dependencias:** Terraform destaca por su capacidad de entender la jerarquía. Al asignar el nombre del grupo de recursos mediante una referencia (`azurerm_resource_group.rg.name`), Terraform entiende automáticamente que primero debe existir el grupo para poder crear la red en su interior.
+* **Escalabilidad:** Definir la red mediante código permite que, en el futuro, podamos añadir subredes, firewalls o balanceadores de carga simplemente agregando nuevos bloques al archivo `main.tf`.
+
+### Código para el `main.tf`
+Añade el siguiente bloque a tu archivo de configuración:
+
+```hcl
+# Create a virtual network
+resource "azurerm_virtual_network" "vnet" {
+  name                = "myTFVnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = "spaincentral"
+  resource_group_name = azurerm_resource_group.rg.name
+}
+```
+
+---
+
+## 13. Actualización de la Infraestructura: Aplicando Cambios
+
+Tras modificar el archivo `main.tf` para incluir la Red Virtual, debemos ejecutar nuevamente el comando de aplicación para que Terraform sincronice los cambios con la nube de Azure.
+
+### ¿Qué sucede en este proceso?
+Durante la ejecución, Terraform realiza las siguientes tareas de control:
+* **Refresco de Estado (Refreshing State):** Antes de proponer cambios, Terraform contacta con Azure para confirmar que el Grupo de Recursos previo sigue existiendo y mantiene la configuración registrada en el estado local.
+* **Análisis Diferencial:** Terraform compara el estado actual en la nube con el nuevo código. Detectará que el Grupo de Recursos ya está presente (`0 to change`), por lo que solo marcará para creación el nuevo recurso detectado: la VNet (`1 to add`).
+* **Gestión de Atributos:** En la terminal verás valores como `guid` o `id` marcados como `(known after apply)`. Esto indica que son identificadores que Azure generará automáticamente una vez se complete la creación.
+
+### Comando de Actualización
+Para aplicar los cambios, ejecuta de nuevo:
+
+```powershell
+$ terraform apply
+```
+
+Al finalizar, el sistema devolverá el mensaje: `Apply complete! Resources: 1 added, 0 changed, 0 destroyed.`
