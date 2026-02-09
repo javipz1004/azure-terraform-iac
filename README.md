@@ -32,7 +32,7 @@ Para instalar los permisos que Azure necesita para autenticarse de forma local, 
 $ az login
 ```
 
-![Captura: Proceso de Login en la Terminal](img/az_login.png)
+![Captura: Proceso de Login en la Terminal](images/az_login.png)
 
 > **🔒 Nota de Seguridad:** Es fundamental ocultar el **Subscription ID** y el **Tenant ID** en capturas de pantalla o entornos públicos (como este repositorio) para proteger la privacidad y seguridad de tu cuenta.
 
@@ -44,6 +44,3 @@ Establece la suscripción de trabajo mediante el siguiente comando sustituyendo 
 ```powershell
 $ az account set --subscription "TU_SUBSCRIPTION_ID_AQUÍ"
 ```
-
-```powershell
-$ az account set --subscription "tu-subscription-id"
