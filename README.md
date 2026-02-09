@@ -1,9 +1,4 @@
-# azure-terraform-iac
-# Configuración de Prerrequisitos y Autenticación en Azure
-
-Esta sección detalla los pasos iniciales necesarios para preparar el entorno local y establecer una conexión segura con la nube de Azure antes de realizar cualquier despliegue con Terraform.
-
----
+# Azure-Terraform-IaC
 
 ## 1. Prerrequisitos del Sistema
 
