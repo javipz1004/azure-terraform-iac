@@ -176,3 +176,45 @@ $ terraform init
 ```
 
 ![Captura: Inicialización de Terraform Exitosa](images/message_terraform_init.png)
+
+---
+
+## 8. Formateo y Validación de la Configuración
+
+Antes de proceder con el despliegue en la nube, es una práctica recomendada por **HashiCorp** asegurarse de que nuestro código cumple con los estándares de estilo y es sintácticamente correcto.
+
+### ¿Por qué se hace esto?
+* **Consistencia Estética (`terraform fmt`):** Este comando formatea automáticamente tus archivos de configuración para que sigan el estilo oficial de HCL (indentación, alineación de columnas, espacios, etc.). Esto facilita enormemente la lectura del código al trabajar en equipo o al compartir tu proyecto en **GitHub**.
+* **Seguridad Sintáctica (`terraform validate`):** Este comando verifica que el archivo `main.tf` no tenga errores internos. Comprueba que los nombres de los recursos sean válidos, que las referencias sean correctas y que no falten argumentos obligatorios. Esto evita que el proceso falle más tarde durante la fase de ejecución.
+* **Calidad del Código:** El uso constante de estos comandos demuestra un flujo de trabajo profesional, asegurando que solo subimos a nuestro repositorio código que ha pasado un "control de calidad" previo.
+
+### Comandos de Validación
+Para asegurar la integridad de tu configuración, ejecuta:
+
+```powershell
+$ terraform fmt
+$ terraform validate
+```
+
+## 9. Aplicación de la Configuración (`terraform apply`)
+
+El comando `terraform apply` es la orden de ejecución real. A diferencia de otros comandos de consulta, este no solo simula la infraestructura, sino que abre una conexión activa con Azure para construir los recursos definidos en el `main.tf`.
+
+### ¿Por qué es especial este paso?
+* **Confirmación de Seguridad:** Por defecto, Terraform volverá a mostrarte un plan de ejecución detallado y se detendrá. Te preguntará: `"Do you want to perform these actions?"`. Esta es una red de seguridad vital para evitar despliegues accidentales o costes inesperados.
+* **Interactividad Obligatoria:** El sistema no avanzará hasta que escribas exactamente la palabra **`yes`**. Cualquier otra respuesta abortará la operación de inmediato sin realizar cambios en tu suscripción de Azure.
+* **Construcción en Vivo:** Una vez confirmado, verás en tiempo real cómo Azure crea el Grupo de Recursos. Al finalizar, Terraform actualizará automáticamente tu **archivo de estado (`.tfstate`)** para registrar que ese recurso ya está oficialmente bajo su control.
+
+### Comando de Despliegue
+Para aplicar los cambios y desplegar tu infraestructura en Azure, ejecuta:
+
+```powershell
+$ terraform apply
+```
+
+![Captura: Aplicación exitosa en Azure](images/message_terraform_apply.png)
+![Captura: Aplicación exitosa en Azure](images/message_apply_group_of_resources.png)
+
+---
+
+> **Nota de Transición:** Tras el éxito del despliegue, es fundamental entender el "cerebro" de la herramienta: cómo Terraform gestiona y recuerda todo lo que acaba de construir.
