@@ -386,7 +386,8 @@ Una vez finalizado el aprendizaje o cuando una infraestructura ya no es necesari
 * **Limpieza Selectiva:** A diferencia de borrar recursos manualmente en el portal, `terraform destroy` solo eliminará aquello que está especificado en tu archivo de estado, sin afectar a otros proyectos que existan en la misma cuenta.
 
 ### Pasos para limpiar el entorno:
-1. **Ejecuta el comando:** ```powershell
+1. **Ejecuta el comando:**
+   ```powershell
    $ terraform destroy
    ```
 2. **Revisa el plan:** Terraform te mostrará un resumen de todo lo que va a borrar (en este caso, los 2 recursos creados).
