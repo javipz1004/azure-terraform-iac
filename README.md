@@ -303,3 +303,53 @@ $ terraform apply
 ```
 
 Al finalizar, el sistema devolverá el mensaje: `Apply complete! Resources: 1 added, 0 changed, 0 destroyed.`
+
+---
+
+## 14. Modificación de Recursos Existentes (Uso de Tags)
+
+Una de las grandes ventajas de Terraform es su capacidad para modificar recursos existentes sin necesidad de destruirlos y recrearlos desde cero, siempre que el tipo de cambio lo permita. En este paso, añadiremos etiquetas (**tags**) a nuestro Grupo de Recursos para mejorar su organización y trazabilidad en el portal de Azure.
+
+### ¿Por qué usamos etiquetas?
+* **Organización de Costes:** Las etiquetas permiten filtrar y desglosar los gastos en la facturación de Azure (por ejemplo, para saber cuánto presupuesto consume exactamente el equipo de "DevOps").
+* **Gestión de Entornos:** Ayudan a identificar rápidamente si un recurso pertenece a "Producción", "Testing" o, como en este caso, a un laboratorio de aprendizaje.
+* **Actualización "In-Place":** A diferencia del cambio de ubicación (*location*), añadir etiquetas es un cambio **no destructivo**. Terraform simplemente actualizará los metadatos del recurso en Azure de forma instantánea.
+
+### Actualización del Código (`main.tf`)
+Modifica el bloque `azurerm_resource_group` en tu archivo para incluir las etiquetas:
+
+```hcl
+resource "azurerm_resource_group" "rg" {
+  name     = "myTFResourceGroup"
+  location = "spaincentral"
+  
+  tags = {
+    Environment = "Terraform Getting Started"
+    Team        = "DevOps"
+  }
+}
+```
+
+Para aplicar los cambios, ejecuta nuevamente el comando:
+```powershell
+$ terraform apply
+```
+![Captura: Listado de recursos en el estado](images/message_apply_tag.png)
+
+---
+
+## 15. Revisión de las Actualizaciones en el Estado
+
+Tras realizar una modificación "in-place", es fundamental verificar que Terraform ha sincronizado correctamente estos nuevos valores con su archivo de estado local (`.tfstate`). Esto garantiza que la realidad en Azure coincide exactamente con lo que tenemos definido en nuestro código.
+
+### ¿Qué estamos comprobando aquí?
+* **Persistencia de Metadatos:** Al usar `terraform show`, comprobaremos que el bloque `tags` ahora aparece correctamente dentro de las propiedades del recurso.
+* **Integridad del Estado:** Confirmamos que, a pesar de los cambios en los metadatos, los identificadores críticos (como el `id` o la `location`) se mantienen intactos.
+* **Sincronización Total:** Esta revisión nos da la tranquilidad de que el archivo de estado está actualizado y listo para la siguiente sesión de trabajo o para compartir con el equipo.
+
+### Comando de Verificación
+```powershell
+$ terraform show
+```
+
+> **🔒 Nota de Seguridad:** Por motivos de seguridad, no se incluye una captura de pantalla de este paso. La salida de `terraform show` contiene información sensible sobre la suscripción de Azure (como el Subscription ID y otros identificadores únicos) que debe permanecer privada para no comprometer la cuenta.
