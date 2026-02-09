@@ -218,3 +218,49 @@ $ terraform apply
 ---
 
 > **Nota de Transición:** Tras el éxito del despliegue, es fundamental entender el "cerebro" de la herramienta: cómo Terraform gestiona y recuerda todo lo que acaba de construir.
+
+---
+
+## 10. Inspección del Estado de la Infraestructura (`terraform show`)
+
+Cuando Terraform crea recursos, genera automáticamente un archivo fundamental llamado `terraform.tfstate`. Este archivo actúa como una base de datos local que contiene los IDs y las propiedades exactas de todos los recursos que Terraform tiene bajo su control.
+
+### ¿Por qué es importante este paso?
+* **Visibilidad de Metadatos:** Al ejecutar `terraform show`, podemos inspeccionar información detallada que Azure ha asignado automáticamente (como el ID único del recurso o direcciones IP), datos que no estaban definidos en nuestro código original pero que son vitales para la infraestructura.
+* **Gestión del Ciclo de Vida:** El archivo de estado es el que permite que Terraform sepa exactamente qué debe modificar o destruir en el futuro sin tener que "adivinar" qué hay desplegado en la nube. Es la "única fuente de verdad" para la herramienta.
+
+### ⚠️ Nota de Seguridad Crítica
+Es vital advertir que el archivo `terraform.tfstate` puede contener valores sensibles en texto plano.
+* **Nunca debe subirse al control de versiones (GitHub).**
+* Se recomienda encarecidamente añadirlo al archivo `.gitignore` desde el inicio del proyecto.
+
+### Comando de Inspección
+Para revisar el estado actual de los recursos desplegados, utiliza:
+
+```powershell
+$ terraform show
+```
+
+> **Nota sobre seguridad:** En este tutorial se omite la captura de pantalla de la salida de este comando. Tanto el archivo de estado como el comando `terraform show` muestran metadatos internos, como el **Subscription ID** y otros identificadores únicos. Compartir estos IDs en un repositorio público podría comprometer la seguridad de tu cuenta de Azure.
+
+---
+
+## 11. Listado y Gestión del Estado (`terraform state`)
+
+Mientras que el comando anterior nos ofrece todos los detalles técnicos de forma extensa, Terraform proporciona herramientas específicas para listar y manipular los recursos gestionados de forma individual y simplificada.
+
+### ¿Por qué se hace esto?
+* **Inventario Rápido (`list`):** Permite obtener un listado limpio y directo de todos los recursos que Terraform está gestionando actualmente, sin necesidad de leer todo el archivo de configuración o el estado detallado.
+* **Control Avanzado:** El comando `terraform state` abre la puerta a operaciones complejas, como mover recursos dentro del estado o eliminar un recurso del control de Terraform (hacerlo "invisible" para la herramienta) sin llegar a borrarlo físicamente de Azure.
+* **Seguridad y Trazabilidad:** Cada vez que interactuamos con el estado, Terraform asegura que la base de datos local sea coherente con lo que realmente existe en la nube, creando copias de seguridad automáticas antes de realizar cualquier modificación crítica.
+
+### Comando de Listado
+Para ver la lista simplificada de recursos que están actualmente en tu estado, ejecuta:
+
+```powershell
+$ terraform state list
+```
+
+![Captura: Listado de recursos en el estado](images/terraform_state_list.png)
+![Captura: Listado de recursos en el estado](images/terraform_state.png)
+
