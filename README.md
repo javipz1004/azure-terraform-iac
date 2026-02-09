@@ -118,3 +118,61 @@ Ejecuta el siguiente comando en PowerShell para crear tu espacio de trabajo:
 ```powershell
 $New-Item -Path "C:\" -Name "learn-terraform-azure" -ItemType "directory"$ cd C:\learn-terraform-azure
 ```
+---
+
+## 6. Definición de la Infraestructura (`main.tf`)
+
+En este paso, creamos un archivo de texto plano llamado `main.tf` dentro del directorio del proyecto. Este archivo actúa como el **plano arquitectónico** de nuestra infraestructura; es el documento donde escribimos el código declarativo que Azure interpretará para construir los recursos.
+
+### ¿Por qué se hace esto?
+* **Infraestructura como Código (IaC):** En lugar de crear recursos manualmente haciendo clic en portales web (proceso propenso a errores), dejamos constancia escrita de nuestra red. Esto permite versionar el archivo en GitHub, compartirlo con otros equipos y replicar la misma infraestructura exactas veces de forma automática.
+* **Declaración de Proveedores:** Especificamos que vamos a usar el proveedor oficial de Azure (`azurerm`) y definimos la versión exacta para asegurar la compatibilidad y estabilidad del proyecto a largo plazo.
+* **Gestión de Recursos:** Definimos el primer componente real, el **Resource Group (Grupo de Recursos)**, que servirá como contenedor lógico para todos los elementos que creemos después (como la VNet y la Subnet).
+
+### Código de Configuración (`main.tf`)
+Copia el siguiente bloque de código dentro de tu archivo:
+
+```hcl
+# Configure the Azure provider
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0.2"
+    }
+  }
+
+  required_version = ">= 1.1.0"
+}
+
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "rg" {
+  name     = "myTFResourceGroup"
+  location = "spaincentral"
+}
+```
+
+> **Nota sobre la ubicación:** En este ejemplo utilizamos `spaincentral`. Asegúrate de poner la localización en la que tu suscripción te permita crear recursos (puedes consultar las regiones disponibles en tu suscripción de Azure).
+
+---
+
+## 7. Inicialización del Proyecto (`terraform init`)
+
+Una vez que el archivo `main.tf` está listo, el primer comando que debemos ejecutar es `terraform init`. Este paso es esencial para preparar el directorio de trabajo y permitir que Terraform "entienda" las instrucciones que hemos escrito.
+
+### ¿Para qué se hace esto?
+* **Descarga de Proveedores (Providers):** Terraform es una herramienta agnóstica; al leer el código, detecta que trabajaremos con Azure y descarga automáticamente el plugin oficial de `azurerm` necesario para comunicarse con su API.
+* **Configuración del Backend:** Prepara el espacio donde se almacenará el **archivo de estado** (`terraform.tfstate`). Esta es la base de datos local donde Terraform registrará qué recursos ha creado y cuál es su configuración actual.
+* **Verificación de Versiones:** Comprueba que la versión de Terraform instalada y los plugins descargados cumplen con las restricciones de versión que definimos en el bloque `terraform` de nuestro código.
+
+### Comando de Inicialización
+Para preparar tu entorno de trabajo, ejecuta:
+
+```powershell
+$ terraform init
+```
+
+![Captura: Inicialización de Terraform Exitosa](images/message_terraform_init.png)
