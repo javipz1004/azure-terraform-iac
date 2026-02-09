@@ -79,3 +79,42 @@ Por razones críticas de seguridad, **no se incluye una captura de pantalla de e
 * Solo se muestra una vez al momento de la creación.
 * Permite el acceso total a los recursos bajo el rol asignado dentro de la suscripción.
 * **Bajo ninguna circunstancia** debe ser compartido, enviado por canales no seguros o subido a un repositorio público.
+
+---
+
+## 4. Configuración de Variables de Entorno
+
+Para que Terraform pueda autenticarse con Azure de forma automática y segura, utilizaremos **Variables de Entorno** en nuestra terminal. Esto permite que el proveedor de Azure lea las credenciales directamente de la memoria del sistema sin que estas queden registradas en el código.
+
+### ¿Por qué se hace esto?
+* **Seguridad (Evitar fugas de secretos):** Es la razón principal. Si escribimos las contraseñas dentro del código y subimos ese archivo a GitHub, cualquier persona podría robar nuestras credenciales. Al usar variables de entorno, las llaves solo viven en la memoria temporal de tu sesión de terminal.
+* **Flexibilidad:** Permite que el mismo código de Terraform se ejecute en diferentes entornos (Desarrollo, Producción) simplemente cambiando las variables de la terminal, sin tocar una sola línea de código.
+* **Estándar Profesional:** Es el método recomendado por **HashiCorp** y el estándar utilizado en consultoras de alto nivel como **Avanade** para proteger la infraestructura crítica.
+
+### Comandos de Configuración (PowerShell)
+Asignaremos los valores obtenidos del Service Principal mediante los siguientes comandos. Sustituye los valores en mayúsculas por tus credenciales:
+
+```powershell
+$env:ARM_CLIENT_ID = "TU_APP_ID"
+$env:ARM_CLIENT_SECRET = "TU_PASSWORD"
+$env:ARM_TENANT_ID = "TU_TENANT_ID"
+$env:ARM_SUBSCRIPTION_ID = "TU_SUBSCRIPTION_ID"
+```
+
+---
+
+## 5. Creación del Directorio de Proyecto
+
+Para mantener una estructura profesional y evitar conflictos con otros experimentos, crearemos una carpeta dedicada exclusivamente a este despliegue.
+
+### ¿Por qué es importante el aislamiento?
+* **Aislamiento del Estado:** Terraform genera archivos locales críticos como la carpeta `.terraform/` y el archivo `terraform.tfstate`. Estos archivos gestionan la infraestructura de forma aislada; tener una carpeta propia evita que el estado de un proyecto sobrescriba a otro.
+* **Orden y Limpieza:** Facilita la gestión del repositorio en GitHub. Un entorno limpio permite que tú o cualquier colaborador localice el archivo `main.tf` rápidamente.
+* **Preparación para el Init:** El comando de inicialización (`terraform init`) debe ejecutarse siempre dentro de la carpeta raíz del proyecto para que Terraform reconozca correctamente los archivos de configuración.
+
+### Comando de Creación
+Ejecuta el siguiente comando en PowerShell para crear tu espacio de trabajo:
+
+```powershell
+$New-Item -Path "C:\" -Name "learn-terraform-azure" -ItemType "directory"$ cd C:\learn-terraform-azure
+```
