@@ -6,7 +6,7 @@ Para comenzar con este proyecto, es indispensable contar con las siguientes herr
 
 * **Suscripción de Azure:** Se requiere una cuenta activa para la gestión de recursos. Puedes obtener una cuenta gratuita o para estudiantes en el siguiente enlace: [Azure Account Setup](https://azure.microsoft.com/en-us/pricing/purchase-options/azure-account?icid=azurefreeaccount).
 * **Instalación Local de Terraform:** Descarga e instala el ejecutable en tu máquina local. 
-    > **⚠️ Nota Crítica:** No olvides añadir la ruta de instalación a las **Variables de Entorno del sistema (PATH)** para que la terminal reconozca el comando `terraform` desde cualquier directorio.  
+    > **Nota Crítica:** No olvides añadir la ruta de instalación a las **Variables de Entorno del sistema (PATH)** para que la terminal reconozca el comando `terraform` desde cualquier directorio.  
     [Descarga de Terraform](https://developer.hashicorp.com/terraform/install)
 * **Azure CLI:** Esta herramienta permite la comunicación y autenticación entre tu máquina local y los servicios de Azure. Instálala ejecutando el siguiente comando en PowerShell:
 
@@ -21,7 +21,7 @@ $ Invoke-WebRequest -Uri [https://aka.ms/installazurecliwindows](https://aka.ms/
 Con los requisitos instalados, procedemos a configurar los permisos de acceso local para que Terraform pueda operar en nuestra infraestructura.
 
 ### Inicio de Sesión (`az login`)
-Para instalar los permisos que Azure necesita para autenticarse de forma local, realizamos el inicio de sesión mediante el CLI de Azure:
+Para instalar los permisos que Terraform necesita para autenticarse de forma local, realizamos el inicio de sesión mediante el CLI de Azure:
 
 ```powershell
 $ az login
@@ -29,7 +29,7 @@ $ az login
 
 ![Captura: Proceso de Login en la Terminal](images/az_login.png)
 
-> **🔒 Nota de Seguridad:** Es fundamental ocultar el **Subscription ID** y el **Tenant ID** en capturas de pantalla o entornos públicos (como este repositorio) para proteger la privacidad y seguridad de tu cuenta.
+> **Nota de Seguridad:** Es fundamental ocultar el **Subscription ID** y el **Tenant ID** en capturas de pantalla o entornos públicos (como este repositorio) para proteger la privacidad y seguridad de tu cuenta.
 
 ### Selección de la Suscripción Activa
 Tras la autenticación, el CLI mostrará un listado de todas las suscripciones asociadas a tu cuenta. Es **fundamental fijar la suscripción activa** donde deseamos que Terraform realice los despliegues (por ejemplo, la de **Estudiantes**) para asegurar que los recursos se creen en el entorno correcto y se utilicen los créditos adecuados.
@@ -69,7 +69,7 @@ Al ejecutar el comando, la terminal devolverá un objeto JSON con cuatro valores
 
 ---
 
-### ⚠️ Advertencia de Seguridad
+### Advertencia de Seguridad
 Por razones críticas de seguridad, **no se incluye una captura de pantalla de esta salida**. El valor de la **password** es extremadamente sensible:
 * Solo se muestra una vez al momento de la creación.
 * Permite el acceso total a los recursos bajo el rol asignado dentro de la suscripción.
@@ -84,8 +84,7 @@ Para que Terraform pueda autenticarse con Azure de forma automática y segura, u
 ### ¿Por qué se hace esto?
 * **Seguridad (Evitar fugas de secretos):** Es la razón principal. Si escribimos las contraseñas dentro del código y subimos ese archivo a GitHub, cualquier persona podría robar nuestras credenciales. Al usar variables de entorno, las llaves solo viven en la memoria temporal de tu sesión de terminal.
 * **Flexibilidad:** Permite que el mismo código de Terraform se ejecute en diferentes entornos (Desarrollo, Producción) simplemente cambiando las variables de la terminal, sin tocar una sola línea de código.
-* **Estándar Profesional:** Es el método recomendado por **HashiCorp** y el estándar utilizado en consultoras de alto nivel como **Avanade** para proteger la infraestructura crítica.
-
+  
 ### Comandos de Configuración (PowerShell)
 Asignaremos los valores obtenidos del Service Principal mediante los siguientes comandos. Sustituye los valores en mayúsculas por tus credenciales:
 
@@ -150,7 +149,7 @@ resource "azurerm_resource_group" "rg" {
 }
 ```
 
-> **Nota sobre la ubicación:** En este ejemplo utilizamos `spaincentral`. Asegúrate de poner la localización en la que tu suscripción te permita crear recursos (puedes consultar las regiones disponibles en tu suscripción de Azure).
+> **Nota sobre la ubicación:** En este ejemplo utilizamos `spaincentral`. Hay que asegurarse de poner la localización en la que tu suscripción te permita crear recursos (se pueden consultar las regiones disponibles en tu suscripción de Azure).
 
 ---
 
@@ -176,7 +175,7 @@ $ terraform init
 
 ## 8. Formateo y Validación de la Configuración
 
-Antes de proceder con el despliegue en la nube, es una práctica recomendada por **HashiCorp** asegurarse de que nuestro código cumple con los estándares de estilo y es sintácticamente correcto.
+Antes de proceder con el despliegue en la nube, es una práctica recomendada asegurarse de que nuestro código cumple con los estándares de estilo y es sintácticamente correcto.
 
 ### ¿Por qué se hace esto?
 * **Consistencia Estética (`terraform fmt`):** Este comando formatea automáticamente tus archivos de configuración para que sigan el estilo oficial de HCL (indentación, alineación de columnas, espacios, etc.). Esto facilita enormemente la lectura del código al trabajar en equipo o al compartir tu proyecto en **GitHub**.
@@ -212,10 +211,6 @@ $ terraform apply
 
 ---
 
-> **Nota de Transición:** Tras el éxito del despliegue, es fundamental entender el "cerebro" de la herramienta: cómo Terraform gestiona y recuerda todo lo que acaba de construir.
-
----
-
 ## 10. Inspección del Estado de la Infraestructura (`terraform show`)
 
 Cuando Terraform crea recursos, genera automáticamente un archivo fundamental llamado `terraform.tfstate`. Este archivo actúa como una base de datos local que contiene los IDs y las propiedades exactas de todos los recursos que Terraform tiene bajo su control.
@@ -224,10 +219,9 @@ Cuando Terraform crea recursos, genera automáticamente un archivo fundamental l
 * **Visibilidad de Metadatos:** Al ejecutar `terraform show`, podemos inspeccionar información detallada que Azure ha asignado automáticamente (como el ID único del recurso o direcciones IP), datos que no estaban definidos en nuestro código original pero que son vitales para la infraestructura.
 * **Gestión del Ciclo de Vida:** El archivo de estado es el que permite que Terraform sepa exactamente qué debe modificar o destruir en el futuro sin tener que "adivinar" qué hay desplegado en la nube. Es la "única fuente de verdad" para la herramienta.
 
-### ⚠️ Nota de Seguridad Crítica
+### Nota de Seguridad Crítica
 Es vital advertir que el archivo `terraform.tfstate` puede contener valores sensibles en texto plano.
 * **Nunca debe subirse al control de versiones (GitHub).**
-* Se recomienda encarecidamente añadirlo al archivo `.gitignore` desde el inicio del proyecto.
 
 ### Comando de Inspección
 Para revisar el estado actual de los recursos desplegados, utiliza:
@@ -352,7 +346,7 @@ Tras realizar una modificación "in-place", es fundamental verificar que Terrafo
 $ terraform show
 ```
 
-> **🔒 Nota de Seguridad:** Por motivos de seguridad, no se incluye una captura de pantalla de este paso. La salida de `terraform show` contiene información sensible sobre la suscripción de Azure (como el Subscription ID y otros identificadores únicos) que debe permanecer privada para no comprometer la cuenta.
+> **Nota de Seguridad:** Por motivos de seguridad, no se incluye una captura de pantalla de este paso. La salida de `terraform show` contiene información sensible sobre la suscripción de Azure (como el Subscription ID y otros identificadores únicos) que debe permanecer privada para no comprometer la cuenta.
 
 ---
 
@@ -397,7 +391,7 @@ Una vez finalizado el aprendizaje o cuando una infraestructura ya no es necesari
 
 ---
 
-## 💡 Nota Final sobre el Grupo `NetworkWatcherRG`
+## Nota sobre el Grupo `NetworkWatcherRG`
 
 Es posible que, tras ejecutar `terraform destroy`, todavía visualices en tu portal de Azure un grupo de recursos llamado **`NetworkWatcherRG`**. Este es un recurso de sistema creado automáticamente por Azure para la monitorización del tráfico de red en la región de despliegue.
 
@@ -405,3 +399,57 @@ Es posible que, tras ejecutar `terraform destroy`, todavía visualices en tu por
 * **Gestión de Terraform:** Al ser un recurso generado automáticamente por el proveedor de servicios, no forma parte del archivo de estado de Terraform y, por lo tanto, no se elimina con el comando de destrucción.
 * **Coste:** Este grupo es meramente administrativo y **no genera cargos** adicionales en tu suscripción.
 * **Eliminación:** Si deseas una limpieza absoluta, puedes borrarlo manualmente desde el portal de Azure. Sin embargo, ten en cuenta que volverá a aparecer la próxima vez que despliegues recursos de red en esa misma región.
+
+---
+
+## Conclusión: El Valor de la Infraestructura como Código (IaC)
+
+Este tutorial no ha sido solo una serie de comandos; ha sido una demostración práctica de por qué **Terraform** es una de las principales herramientas para gestionar la nube. A través de este ejercicio, hemos validado beneficios críticos que elevan la gestión de IT a un estándar profesional:
+
+### 1. Seguridad y Trazabilidad Blindada
+* **Aislamiento de Credenciales:** Gracias al uso de **Service Principals** y **Variables de Entorno**, hemos evitado exponer secretos en el código, asegurando que las llaves de nuestra infraestructura nunca lleguen a un repositorio público.
+* **Control Total del Estado:** El archivo `.tfstate` permite que Terraform rastree cada recurso de forma única, permitiéndonos inspeccionar el inventario completo con `terraform show` y `terraform state list` de forma instantánea.
+
+### 2. Escalabilidad sin Errores Humanos
+* **Documentación Viva:** El archivo `main.tf` sirve como la única fuente de verdad. Cualquier persona que lea el código sabe exactamente qué hay desplegado en Azure sin tener que navegar por infinitos menús en el portal.
+* **Replicabilidad:** Definir la red y los recursos mediante código permite que, en el futuro, podamos añadir subredes, firewalls o balanceadores de carga simplemente agregando más bloques, garantizando que la infraestructura sea idéntica en cada despliegue.
+
+### 3. Automatización y Eficiencia Operativa
+* **Gestión Inteligente del Cambio:** Hemos comprobado cómo Terraform realiza un "análisis diferencial". Es capaz de actualizar etiquetas sin tocar la red, pero también de destruir y recrear recursos cuando las políticas de Azure así lo exigen.
+* **Ciclo de Vida Optimizado:** Hemos pasado de la creación a la destrucción total en cuestión de segundos con `terraform destroy`, garantizando que no queden recursos "olvidados" que generen costes innecesarios en nuestra suscripción.
+
+---
+
+## Limpieza de Seguridad: El Ciclo de Vida de la Identidad
+
+Una duda común es qué ocurre con el **Service Principal** tras el proyecto. Es vital entender que, aunque borres tus archivos locales o cierres la terminal, esta identidad sigue "viva" en **Microsoft Entra ID** (Azure Active Directory) con permisos activos sobre tu suscripción.
+
+### ¿Cómo se gestiona en una Empresa vs. este Laboratorio?
+
+Es importante diferenciar el flujo de trabajo según el entorno:
+
+* **En Entornos Profesionales:** El Service Principal **no se borra**. Es la identidad que usan los sistemas de CI/CD (GitHub Actions, Azure DevOps) para gestionar la infraestructura a largo plazo. En lugar de borrarlo, se aplican políticas de **Rotación de Secretos** (cambiar la contraseña periódicamente) y se guardan en cajas fuertes digitales como **Azure Key Vault**.
+* **En este Laboratorio de Aprendizaje:** Como se trata de una práctica puntual, lo más profesional es **eliminarlo**. Dejar identidades "huérfanas" con permisos de *Contributor* es un riesgo de seguridad innecesario para tu cuenta de estudiante. Si alguien obtuviera tus credenciales antiguas, podría realizar acciones en tu nombre.
+
+### Pasos para una Limpieza Total
+
+Si deseas dejar tu suscripción 100% limpia porque estás en el entorno adecuado para ello, sigue estos pasos:
+
+#### 1. Identificar y Eliminar el Service Principal
+Si necesitas recordar el ID de tu "robot", puedes listarlo con:
+```powershell
+$ az ad sp list --show-mine --query "[].{Name:displayName, AppID:appId}" --output table
+```
+
+Para borrarlo definitivamente:
+```powershell
+$ az ad sp delete --id "TU_APP_ID_AQUÍ"
+```
+
+#### 2. Cierre de Sesión del CLI
+Cerrar la terminal borra las variables de entorno de la memoria RAM, pero para eliminar los tokens de acceso de tu equipo local, ejecuta:
+```powershell
+$ az logout
+```
+
+---
