@@ -353,3 +353,54 @@ $ terraform show
 ```
 
 > **🔒 Nota de Seguridad:** Por motivos de seguridad, no se incluye una captura de pantalla de este paso. La salida de `terraform show` contiene información sensible sobre la suscripción de Azure (como el Subscription ID y otros identificadores únicos) que debe permanecer privada para no comprometer la cuenta.
+
+---
+
+## 16. Listado Final de Recursos en el Workspace
+
+Tras añadir la Red Virtual y actualizar las etiquetas, nuestro archivo de estado contiene múltiples recursos gestionados de forma simultánea. Es una práctica recomendada utilizar el comando de listado para confirmar que Terraform tiene bajo su control exactamente lo que esperamos.
+
+### ¿Qué nos confirma este paso?
+* **Control de Inventario:** Veremos en una lista simplificada tanto el Grupo de Recursos como la Red Virtual (VNet).
+* **Persistencia:** Confirmamos que la Red Virtual se ha mantenido intacta y operativa tras la actualización de los metadatos (etiquetas) en el grupo de recursos.
+* **Preparación para el Cierre:** Tener total visibilidad de los recursos en el estado es fundamental antes de ejecutar la destrucción, ya que nos permite saber exactamente qué elementos se eliminarán de nuestra suscripción.
+
+### Comando de Listado Actualizado
+Para obtener la lista completa de los recursos gestionados en tu espacio de trabajo:
+
+```powershell
+$ terraform state list
+```
+
+![Captura: Listado final con RG y VNet](images/terraform_state_list_with_vnet.png)
+
+---
+
+## 17. Destrucción de la Infraestructura (`terraform destroy`)
+
+Una vez finalizado el aprendizaje o cuando una infraestructura ya no es necesaria, es una práctica crítica de **seguridad y ahorro de costes** eliminar todos los recursos creados. El comando `terraform destroy` es el proceso inverso al `apply`: termina todos los recursos gestionados por tu proyecto.
+
+### ¿Por qué es fundamental este comando?
+* **Control de Costes:** Evita que recursos olvidados sigan consumiendo crédito o generen facturas innecesarias en tu cuenta de Azure.
+* **Seguridad:** Al eliminar la infraestructura, reduces la superficie de exposición y evitas dejar entornos de prueba abiertos permanentemente.
+* **Limpieza Selectiva:** A diferencia de borrar recursos manualmente en el portal, `terraform destroy` solo eliminará aquello que está especificado en tu archivo de estado, sin afectar a otros proyectos que existan en la misma cuenta.
+
+### Pasos para limpiar el entorno:
+1. **Ejecuta el comando:** ```powershell
+   $ terraform destroy
+   ```
+2. **Revisa el plan:** Terraform te mostrará un resumen de todo lo que va a borrar (en este caso, los 2 recursos creados).
+3. **Confirma la acción:** Al igual que con el despliegue, el sistema se detendrá y exigirá que escribas **`yes`** para proceder con la destrucción definitiva.
+
+![Captura: Proceso de destrucción completado](images/message_resources_destroyed.png)
+
+---
+
+## 💡 Nota Final sobre el Grupo `NetworkWatcherRG`
+
+Es posible que, tras ejecutar `terraform destroy`, todavía visualices en tu portal de Azure un grupo de recursos llamado **`NetworkWatcherRG`**. Este es un recurso de sistema creado automáticamente por Azure para la monitorización del tráfico de red en la región de despliegue.
+
+### ¿Qué debes saber al respecto?
+* **Gestión de Terraform:** Al ser un recurso generado automáticamente por el proveedor de servicios, no forma parte del archivo de estado de Terraform y, por lo tanto, no se elimina con el comando de destrucción.
+* **Coste:** Este grupo es meramente administrativo y **no genera cargos** adicionales en tu suscripción.
+* **Eliminación:** Si deseas una limpieza absoluta, puedes borrarlo manualmente desde el portal de Azure. Sin embargo, ten en cuenta que volverá a aparecer la próxima vez que despliegues recursos de red en esa misma región.
